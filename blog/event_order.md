@@ -66,7 +66,11 @@ Idle callback #1
 
 ### Poll for I/O
 
-由于在 Poll for I/O 阶段需要计算 poll 的timeout 时间。 由于 idel 阶段已经结束。loop 只有check 阶段，并且 没有 timers。所以 poll 的 timeout 为 infinity。所以 poll 阶段会一直等待。check 阶段就无法被调用。于是 loop 就停留在第一次的 iteration。
+由于在 Poll for I/O 阶段需要计算 poll 的timeout 时间。 由于 idel 阶段已经结束。loop 只有check handle，并且没有 timers。
+
+所以 poll 的 timeout 为 infinity。于是 poll 阶段会一直等待。check 阶段就无法被调用。
+
+于是 loop 就停留在第一次的 iteration。
 
 > 其实在libuv code 中，timeout 是-1， 然后会传递给操作系统的epoll（linux）。Epoll 如果timeout 是 -1，会一直等待。
 
