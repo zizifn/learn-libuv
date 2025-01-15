@@ -6,14 +6,14 @@ void check_cb(uv_check_t *handle)
     static int check_counter = 0;
     check_counter += 1;
     printf("Check callback #%d\n", check_counter);
-    uv_check_stop(handle); // Stop the check handle// Stop the event loop after the check callback
+    uv_check_stop(handle); 
 }
 
 void idle_cb(uv_idle_t *handle)
 {
     static int idle_counter = 0;
     idle_counter += 1;
-    printf("Idle callback #%d", idle_counter);
+    printf("Idle callback #%d\n", idle_counter);
     uv_idle_stop(handle); 
 }
 
