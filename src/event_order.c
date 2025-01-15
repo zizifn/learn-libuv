@@ -1,38 +1,41 @@
 #include <uv.h>
 #include <stdio.h>
 
-static int check_counter = 0;
-static int prepare_counter = 0;
-
-static void check_cb(uv_check_t* handle) {
-    check_counter++;
+void check_cb(uv_check_t *handle)
+{
+    static int check_counter = 0;
+    check_counter += 1;
     printf("Check callback #%d\n", check_counter);
+    uv_check_stop(handle); // Stop the check handle// Stop the event loop after the check callback
 }
 
-static void prepare_cb(uv_prepare_t* handle) {
-    prepare_counter++;
-    printf("Prepare callback #%d\n", prepare_counter);
+void idle_cb(uv_idle_t *handle)
+{
+    static int idle_counter = 0;
+    idle_counter += 1;
+    printf("Idle callback #%d", idle_counter);
+    uv_idle_stop(handle); 
 }
 
-int main() {
+int main()
+{
     uv_loop_t *loop = uv_default_loop();
+    uv_check_t check_handle;
+    uv_idle_t idle_handle;
 
-    uv_check_t check_req;
-    uv_prepare_t prepare_req;
+    // Initialize and start check handle
+    uv_check_init(loop, &check_handle);
+    uv_check_start(&check_handle, check_cb);
+    // uv_unref((uv_handle_t*) &check_handle);
 
-    uv_check_init(loop, &check_req);
-    uv_check_start(&check_req, check_cb);
+    // Initialize and start idle handle
+    uv_idle_init(loop, &idle_handle);
+    uv_idle_start(&idle_handle, idle_cb);
 
-    // uv_prepare_init(loop, &prepare_req);
-    // uv_prepare_start(&prepare_req, prepare_cb);
+    printf("Starting event loop\n");
+    uv_run(loop, UV_RUN_DEFAULT); // Run the event loop
+    printf("Event loop stopped\n");
 
-    printf("Before uv_run\n");
-    uv_run(loop, UV_RUN_DEFAULT);
-    printf("After uv_run\n");
-
-    uv_prepare_stop(&prepare_req);
-    uv_check_stop(&check_req);
-
-    uv_loop_close(loop);
+    uv_loop_close(loop); // Close the loop after it finishes
     return 0;
 }
